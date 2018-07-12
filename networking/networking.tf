@@ -108,3 +108,49 @@ resource "aws_route" "main_public" {
     "aws_internet_gateway.main",
   ]
 }
+
+# DHCP Options
+resource "aws_vpc_dhcp_options" "main" {
+  domain_name         = "asci.internal"
+  domain_name_servers = ["AmazonProvidedDNS"]
+
+  tags {
+    Name = "ASCI-Demo-DHCP"
+  }
+}
+
+# Associate DHCP to VPC
+resource "aws_vpc_dhcp_options_association" "main" {
+  vpc_id          = "${aws_vpc.main.id}"
+  dhcp_options_id = "${aws_vpc_dhcp_options.main.id}"
+}
+
+# NAT Gateway
+# EIP for NAT Gateway
+resource "aws_eip" "nat_gw" {
+  vpc = true
+}
+
+# NAT Gateway resource
+resource "aws_nat_gateway" "main" {
+  allocation_id = "${aws_eip.nat_gw.id}"
+  subnet_id     = "${aws_subnet.main_management.id}"
+
+  tags {
+    Name = "ASCI Demo NAT Gateway"
+  }
+
+  depends_on = ["aws_internet_gateway.main"]
+}
+
+# NAT Gateway route
+resource "aws_route" "nat_gw_route" {
+  route_table_id         = "${aws_route_table.main_private.id}"
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = "${aws_nat_gateway.main.id}"
+
+  depends_on = [
+    "aws_nat_gateway.main",
+    "aws_route_table.main_private",
+  ]
+}
