@@ -85,54 +85,26 @@ data "aws_iam_policy_document" "mgt_main" {
   }
 }
 
-# IAM Policies
-# IAM Policy for Management Server
-resource "aws_iam_policy" "mgt_main" {
-  name        = "mgt_iam_policy"
-  policy      = "${data.aws_iam_policy_document.mgt_main.json}"
-  description = "The policy used to allow Management Server permissions to troubleshoot services and others."
+# IAM Role and Policy for management server
+module "mgmt_role" {
+  source             = "../modules/iam/"
+  policy_name        = "mgt_iam_policy"
+  policy_json        = "${data.aws_iam_policy_document.mgt_main.json}"
+  policy_description = "The policy used to allow Management Server permissions to troubleshoot services and others."
+
+  role_name         = "mgt_iam_role"
+  role_trust_policy = "${data.aws_iam_policy_document.ec2_trust.json}"
+  role_description  = "IAM Role used to allow Management Instance have permissions to manage infrastructure and troubleshoot issues."
 }
 
-# IAM Policy for Application Servers
-resource "aws_iam_policy" "app_main" {
-  name        = "app_iam_role"
-  policy      = "${data.aws_iam_policy_document.app_main.json}"
-  description = "IAM Role used to allow Application Servers to have permissions to access S3."
-}
+# IAM Role and Policy for app servers
+module "app_role" {
+  source             = "../modules/iam/"
+  policy_name        = "app_iam_policy"
+  policy_json        = "${data.aws_iam_policy_document.app_main.json}"
+  policy_description = "IAM policy used to allow Application Servers to have permissions to access S3."
 
-# IAM Policy Attachments
-# IAM Policy Attachment for Management Server
-resource "aws_iam_role_policy_attachment" "mgt_main" {
-  role       = "${aws_iam_role.mgt_main.name}"
-  policy_arn = "${aws_iam_policy.mgt_main.arn}"
-}
-
-# IAM Policy Attachment for Application Servers
-resource "aws_iam_role_policy_attachment" "app_main" {
-  role       = "${aws_iam_role.app_main.name}"
-  policy_arn = "${aws_iam_policy.app_main.arn}"
-}
-
-# IAM Roles
-resource "aws_iam_role" "app_main" {
-  name               = "app_iam_role"
-  description        = "IAM Role used to allow Application Servers to have permissions to access S3."
-  assume_role_policy = "${data.aws_iam_policy_document.ec2_trust.json}"
-}
-
-resource "aws_iam_role" "mgt_main" {
-  name               = "mgt_iam_role"
-  description        = "IAM Role used to allow Management Instance have permissions to manage infrastructure and troubleshoot issues."
-  assume_role_policy = "${data.aws_iam_policy_document.ec2_trust.json}"
-}
-
-# IAM Instance Profiles
-resource "aws_iam_instance_profile" "app_main" {
-  name = "app_iam_role"
-  role = "${aws_iam_role.app_main.name}"
-}
-
-resource "aws_iam_instance_profile" "mgt_main" {
-  name = "mgt_iam_role"
-  role = "${aws_iam_role.mgt_main.name}"
+  role_name         = "app_iam_role"
+  role_trust_policy = "${data.aws_iam_policy_document.ec2_trust.json}"
+  role_description  = "IAM Role used to allow Application Servers to have permissions to access S3."
 }

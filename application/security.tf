@@ -5,7 +5,6 @@ resource "aws_key_pair" "app_main" {
   public_key = "${file("app_us-east-1_key.pub")}"
 }
 
-# Management Server
 resource "aws_key_pair" "mgt_main" {
   key_name   = "mgt_us-east-1_key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCPjA/XaGw8dN19tieXbzOO8p0DLaPAbZ1mSKiBzOw8CYy5/x+79QhTQjSe2nkXl3+/l4/HgoxW0DEQS+9TNOaHIJ5kx3Ls5k8DOBz0+2+23pNKqCGWSPoOEXlBaFUkNbL2G1qICj4Sr5WXbyahSThZh8iskF5Gv/seDit7gpFGqy+fpQr6lxpQRVMXOcQaBLM0X1bp+BSllJkoYm5I+5oIREa3W5+eHewewVmq5TS65HxL8G34pGxHGSW6iEvbIuTj97dU24E69ZU3GNUhukrwzrB8W7LJGpd0xauIOJdSFQdd9oY+3CO+eigofWXxw2HRn1vBVX8UTUYHHvDZ2npd mgt_us-east-1_key"

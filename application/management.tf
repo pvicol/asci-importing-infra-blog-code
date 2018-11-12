@@ -10,7 +10,7 @@ resource "aws_instance" "mgt_main" {
   instance_type        = "t2.micro"
   key_name             = "${aws_key_pair.mgt_main.id}"
   subnet_id            = "${data.terraform_remote_state.networking.management_subnet}"
-  iam_instance_profile = "${aws_iam_instance_profile.mgt_main.id}"
+  iam_instance_profile = "${module.mgmt_role.instance_profile_name}"
 
   vpc_security_group_ids = [
     "${aws_security_group.mgt_main.id}",

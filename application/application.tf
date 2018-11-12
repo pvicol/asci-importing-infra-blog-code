@@ -42,7 +42,7 @@ resource "aws_launch_configuration" "app_main" {
   name_prefix          = "ASCI Demo - App Servers Launch Config"
   image_id             = "${data.aws_ami.amz.id}"
   instance_type        = "t2.micro"
-  iam_instance_profile = "${aws_iam_role.app_main.name}"
+  iam_instance_profile = "${module.app_role.instance_profile_name}"
   key_name             = "${aws_key_pair.app_main.id}"
   enable_monitoring    = false
 
@@ -65,6 +65,7 @@ resource "aws_autoscaling_group" "main" {
   wait_for_capacity_timeout = "10m"
   launch_configuration      = "${aws_launch_configuration.app_main.name}"
   target_group_arns         = ["${aws_lb_target_group.main.arn}"]
+  vpc_zone_identifier       = ["${data.terraform_remote_state.networking.private_subnets}"]
 
   lifecycle {
     create_before_destroy = true
@@ -77,7 +78,7 @@ resource "aws_alb" "main" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = ["${aws_security_group.alb_main.id}"]
-  subnets            = ["${data.terraform_remote_state.networking.public_subnet_a}", "${data.terraform_remote_state.networking.public_subnet_b}"]
+  subnets            = ["${data.terraform_remote_state.networking.public_subnets}"]
 }
 
 # HTTPS Listener

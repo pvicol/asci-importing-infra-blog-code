@@ -1,21 +1,13 @@
 output "vpc_id" {
-  value = "${aws_vpc.main.id}"
+  value = "${module.main.vpc_id}"
 }
 
-output "private_subnet_a" {
-  value = "${aws_subnet.main_private_a.id}"
+output "private_subnets" {
+  value = "${module.main.private_subnets}"
 }
 
-output "private_subnet_b" {
-  value = "${aws_subnet.main_private_b.id}"
-}
-
-output "public_subnet_a" {
-  value = "${aws_subnet.main_public_a.id}"
-}
-
-output "public_subnet_b" {
-  value = "${aws_subnet.main_public_b.id}"
+output "public_subnets" {
+  value = "${module.main.public_subnets}"
 }
 
 output "management_subnet" {
